@@ -32,22 +32,6 @@ class LineGraph extends Component {
         this.parseData(consumerData, 'consumerData');
         this.parseData(corporateData, 'corporateData');
         this.parseData(homeData, 'homeData');
-        /*d3.csv(data).then((data) => {
-            const timeConversion = d3.timeParse("%Y-%m-%d");
-            const newData = data.map((d) => {
-                return {
-                    'Order Date': timeConversion(d['Order Date']),
-                    'Sales': parseFloat(d['Sales'])
-                }
-            })
-            this.setState(
-                produce((draft) => {
-                    draft.data.consumerData = newData;
-                }),
-            );
-        }).catch((err) => {
-            console.log("error", err);
-        }); */
     }
 
     parseData(data, segment) {
@@ -115,8 +99,6 @@ class LineGraph extends Component {
     drawChart(data) {
         const margin = { top: 10, right: 50, bottom: 50, left: 50 }
 
-        console.log(data);
-        console.log(data[0]['Sales']);
         const yMinValue = d3.min(data, (d) => d['Sales']);
         const yMaxValue = d3.max(data, (d) => d['Sales']);
         const xMinValue = d3.min(data, d => d['Order Date']);

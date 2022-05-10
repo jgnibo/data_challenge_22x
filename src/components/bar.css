@@ -22,13 +22,24 @@
     margin: 2px;
 }
 
-.axis {
+.x-axis {
     color: #ffffff;
+    font-size: 1.25rem;
+    font-family: alliance;
 }
 
-.bar-text {
+.y-axis {
     font-family: alliance;
     font-size: 1.25rem;
     color: #ffffff;
 }
 
+
+#bar-viz {
+    padding: 50px 50px 50px 50px;
+}
+
+svg {
+    display: flex;
+    justify-content: center;
+}

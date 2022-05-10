@@ -15,7 +15,7 @@ class App extends Component {
         return (
             <div>
                 <h1 id="title">Superstore Dataset</h1>
-                <LineGraph height={600} width={1000}/>
+                
                 <BarGraph height={600} width={1000} />
             </div>
             

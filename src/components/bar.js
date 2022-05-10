@@ -1,10 +1,14 @@
-import React, { Component } from 'react';
+import React, { Component, useCallback } from 'react';
 import Checkbox from '@mui/material/Checkbox';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { enableAllPlugins, produce } from 'immer';
 import * as d3 from 'd3';
-import data from './../notebooks/consumer_sub_sales.csv'
+import consumerData from './../notebooks/consumer_sub_sales.csv'
+import corporateData from './../notebooks/corporate_sub_sales.csv'
+import homeData from './../notebooks/home_sub_sales.csv'
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
 
 import './bar.css';
 
@@ -16,85 +20,65 @@ class BarGraph extends Component {
         super(props);
 
         this.state = {
-            consumerSelected: true,
-            corporateSelected: false, 
-            homeSelected: false,
-            allSelected: false,
-            data: {}
+            data: {
+                consumerData: {},
+                corporateData: {},
+                homeData: {}
+            },
+            workingData: null
         }
     }
 
     componentDidMount() {
+        this.parseData(consumerData, 'consumerData');
+        this.parseData(corporateData, 'corporateData');
+        this.parseData(homeData, 'homeData');
+        this.createChart();
+    }
+
+    parseData(data, segment) {
         d3.csv(data).then((data) => {
             const newData = data.map((d) => {
                 return {
                     'Subcategory': d['Subcategory'],
                     'Sales Percentage': parseFloat(d['Sales Percentage']),
-                    'Profit Percentage': parseFloat(d['Profit Percentage'])
+                    'Profit Percentage': parseFloat(d['Profit Percentage']),
+                    'Sales': parseFloat(d['Sales']),
+                    'Profit': parseFloat(d['Profit'])
                 }
             })
             this.setState(
                 produce((draft) => {
-                    draft.data = newData;
-                })
+                    draft.data[segment] = newData;
+                    if(segment === 'consumerData') {
+                        draft.workingData = newData;
+                    }
+                }),
             );
         }).catch((err) => {
-            console.log('error', err);
-        })
+            console.log("error", err);
+        });
     }
 
-    toggleConsumer = () =>  {
-        this.setState(
-            produce((draft) => {
-                draft.consumerSelected = !draft.consumerSelected;
-            }),
-        );
-        console.log(this.state.consumerData);
-    }
+    createChart = () => {
+        const margin = { top: 10, right: 30, bottom: 100, left: 50 };
 
-    toggleCorporate = () => {
-        this.setState(
-            produce((draft) => {
-                draft.corporateSelected = !draft.corporateSelected;
-            }),
-        );
-        this.drawChart(this.state.data);
-    }
-
-    toggleHome = (callback) =>  {
-        this.setState(
-            produce((draft) => {
-                draft.homeSelected = !draft.homeSelected;
-            }), this.display)
+        const svg = d3
+            .select('#bar-viz')
+            .append('svg')
+            .attr('width', this.props.width)
+            .attr('height', this.props.height)
+            .append('g')
+            .attr('transform', `translate(${margin.left}, ${margin.top})`)
         
+            
+            
     }
 
-    display() {
-        console.log(this.state.homeSelected);
-    }
-
-    updateRenderData() {
-
-    }
-
-    toggleAll = () =>  {
-        this.setState(
-            produce((draft) => {
-                draft.allSelected = !draft.allSelected;
-                if (draft.allSelected) {
-                    draft.consumerSelected = false;
-                    draft.corporateSelected = false;
-                    draft.homeSelected = false;
-                } else {
-                    draft.consumerSelected = true;
-                }
-            }),
-        );
-    }
-
-    drawChart(data) {
-        const margin = { top: 10, right: 50, bottom: 100, left: 50 }
-        
+    updateChart(data) {
+        const margin = { top: 10, right: 50, bottom: 100, left: 50 };
+        const width = this.props.width - margin.left - margin.right;
+        const height = this.props.height - margin.top - margin.bottom;
 
         const yMin = d3.min(data, (d) => d['Sales Percentage']);
         const yMax = d3.max(data, (d) => d['Sales Percentage']);
@@ -105,73 +89,70 @@ class BarGraph extends Component {
         const colorMin = d3.min(data, (d) => d['Profit Percentage']);
         const colorMax = d3.max(data, (d) => d['Profit Percentage']);
 
-        console.log(yMin, yMax, xMin, xMax, colorMin, colorMax);
+        const svg = d3
+            .select('#bar-viz').select('svg')
 
         const colorScale = d3
             .scaleLinear()
             .domain([colorMin, colorMax])
-            .range(['#BA1D53', '#FF0540'])
-            .clamp(true);
+            //.range(['#BA1D53', '#FF0540'])
+            .range(['#BA1D53', '#FFFFFF'])
             
-        const svg = d3
-            .select('#bar-viz')
-            .append('svg')
-            .attr('width', this.props.width + margin.left + margin.right)
-            .attr('height', this.props.height + margin.top + margin.bottom)
-            .append('g')
-            .attr('transform', `translate(${margin.left}, ${margin.top})`)
-        
         // X axis code
-        const xScale = d3
+        var xScale = d3
             .scaleBand()
-            .domain(data.map((d) => { return d['Subcategory']; }))
-            .range([0, this.props.width])
+            .range([0, width])
+            .domain(data.map((d) => { 
+                return d['Subcategory'] }))
             .padding(0.2);
-        
         svg
             .append('g')
-            .attr('class', 'axis')
-            .attr('transform', `translate(0, ${this.props.height})`)
+            .attr('class', 'x-axis')
+            .attr('transform', `translate(${margin.left}, ${height})`)
             .call(
                 d3.axisBottom(xScale)
             )
             .selectAll('text')
-                .attr('class', 'bar-text')
-                .attr('transform', 'translate(-25, 35)rotate(-45)')
+                .attr('transform', 'translate(-10, 10)rotate(-45)')
                 .attr("fill", "#ffffff")
-                .attr('text-align', 'right')
-                .attr('font-size', '1rem')
-                .style('test-anchor', 'end');
+                .style('text-anchor', 'end');
+        
+        
         
         // Y axis code
         
         const yScale = d3
             .scaleLinear()
             .domain([0, yMax])
-            .range([this.props.height, 0]);
+            .range([height, 0]);
         
         svg
             .append('g')
-            .attr('class', 'bar-text')
+            .attr('transform', `translate(${margin.left}, 0)`)
+            .attr('class', 'y-axis')
             .call(
                 d3.axisLeft(yScale)
             );
 
-        const tooltip = d3.select('#bar-viz').append('div')
+        const tooltip = d3.select('#bar-viz')
+            .append('div')
             .attr('class', 'bar-tooltip')
             .style('opacity', 0)
 
+        
         // Bar code
-
+        
         svg
-            .selectAll('.bar')
+            .selectAll('bar')
             .data(data)
             .enter()
             .append('rect')
+                .attr('transform', `translate(${margin.left}, 0)`)
                 .attr('x', (d) => { return xScale(d['Subcategory']); })
                 .attr('width', xScale.bandwidth())
-                .attr('fill', (d) => { return colorScale(d['Profit Percentage']); })
-                .attr('height', (d) => { return this.props.height - yScale(0); })
+                .attr('fill', (d) => { 
+                    return colorScale(d['Profit Percentage']); })
+                .attr('height', (d) => { return height - yScale(0); })
                 .attr('y', (d) => { return yScale(0); })
         
         // Animation
@@ -180,10 +161,13 @@ class BarGraph extends Component {
             .transition()
             .duration(1000)
             .attr('y', (d) => { return yScale(d['Sales Percentage']); })
-            .attr('height', (d) => { return this.props.height - yScale(d['Sales Percentage']); })
+            .attr('height', (d) => { return height - yScale(d['Sales Percentage']); })
+            .attr('fill', (d) => { return colorScale(d['Profit Percentage']); })
+        
+        
+        
         
         // Tooltip
-
         svg
             .selectAll('rect')
             .on('mouseover', (d) => {
@@ -203,11 +187,46 @@ class BarGraph extends Component {
                     .duration(200)
                     .style('opacity', 0);
             })
-
         
+        /*svg.selectAll('div').exit().remove(); */
+        svg.selectAll('rect').data(data).exit().remove();
+        svg.selectAll('.bar-tooltip').data(data).exit().remove();
 
-
+        var yAxis = 
+        svg.selectAll('g.y-axis').call()
         
+    }
+
+    optionClicked = (event) => {
+        if (event.target.value === 'consumer') {
+            this.setState(
+                produce((draft) => {
+                    draft.workingData = draft.data.consumerData;
+                }),
+            );
+        } else if (event.target.value === "corporate") {
+            this.setState(
+                produce((draft) => {
+                    draft.workingData = draft.data.corporateData;
+                }),
+            );
+        } else if (event.target.value === 'home') {
+            this.setState(
+                produce((draft) => {
+                    draft.workingData = draft.data.homeData;
+                }),
+            );
+        }
+    }
+
+    renderGraph() {
+        if (this.state.workingData) {
+            this.updateChart(this.state.workingData);
+        } else {
+            return (
+                <div>Loading...</div>
+            );
+        }
     }
 
     render() {
@@ -215,11 +234,13 @@ class BarGraph extends Component {
             <div id="bar-viz-wrapper" className="viz-module">
                 <h2 className="module-header">Segmented Profit by Subcategory</h2>
                 <div className="selectors">
-                    <FormControlLabel control={<Checkbox defaultChecked onChange={this.toggleConsumer} checked={this.state.consumerSelected} disabled={this.state.allSelected} />} label="Consumer" />
-                    <FormControlLabel control={<Checkbox onChange={this.toggleCorporate} checked={this.state.corporateSelected} disabled={this.state.allSelected} />} label="Corporate" />
-                    <FormControlLabel control={<Checkbox onChange={this.toggleHome} checked={this.state.homeSelected} disabled={this.state.allSelected} />} label="Home Office" />
-                    <FormControlLabel control={<Checkbox onChange={this.toggleAll} checked={this.state.allSelected}/>} label="All" />
+                    <RadioGroup onChange={this.optionClicked} row aria-labelledby="demo-radio-buttons-group-label" defaultValue="consumer" name="radio-buttons-group">
+                        <FormControlLabel value="consumer" control={<Radio />} label="Consumer" />
+                        <FormControlLabel value="corporate" control={<Radio />} label="Corporate" />
+                        <FormControlLabel value="home" control={<Radio />} label="Home Office" />
+                    </RadioGroup>
                 </div>
+                {this.renderGraph()}
                 <div id="bar-viz">
 
                 </div>
