@@ -61,7 +61,7 @@ class BarGraph extends Component {
     }
 
     createChart = () => {
-        const margin = { top: 10, right: 30, bottom: 100, left: 50 };
+        const margin = { top: 50, right: 30, bottom: 150, left: 75 };
 
         const svg = d3
             .select('#bar-viz')
@@ -69,14 +69,39 @@ class BarGraph extends Component {
             .attr('width', this.props.width)
             .attr('height', this.props.height)
             .append('g')
-            .attr('transform', `translate(${margin.left}, ${margin.top})`)
+            .attr('transform', `translate(${margin.left},${margin.top})`)
         
-            
+        const xScale = d3
+            .scaleBand()
+            .range([0, this.props.width-margin.left-margin.right])
+        
+        const yScale = d3
+            .scaleLinear()
+            .range([this.props.height-margin.top-margin.bottom, 0])
+            .domain([0,20])
+        
+        const xAxis = d3
+            .axisBottom(xScale)
+        
+        const yAxis = d3
+            .axisLeft(yScale)
+
+        svg
+            .append('g')
+            .attr('class', 'x-axis')
+            .attr('transform', `translate(0, ${this.props.height-margin.top-margin.bottom})`)
+            .call(xAxis);
+        
+        svg
+            .append('g')
+            .attr('class', 'y-axis')
+            .attr('transform', `translate(0,0)`)
+            .call(yAxis);
             
     }
 
     updateChart(data) {
-        const margin = { top: 10, right: 50, bottom: 100, left: 50 };
+        const margin = { top: 50, right: 50, bottom: 150, left: 75 };
         const width = this.props.width - margin.left - margin.right;
         const height = this.props.height - margin.top - margin.bottom;
 
@@ -99,7 +124,7 @@ class BarGraph extends Component {
             .range(['#BA1D53', '#FFFFFF'])
             
         // X axis code
-        var xScale = d3
+        /*var xScale = d3
             .scaleBand()
             .range([0, width])
             .domain(data.map((d) => { 
@@ -115,7 +140,19 @@ class BarGraph extends Component {
             .selectAll('text')
                 .attr('transform', 'translate(-10, 10)rotate(-45)')
                 .attr("fill", "#ffffff")
-                .style('text-anchor', 'end');
+                .style('text-anchor', 'end'); */
+        
+        /*xScale
+            .domain(data.map((d) => { 
+                return d['Subcategory'] }))
+            .padding(0.2); */
+        
+        const xScale = d3
+            .scaleBand()
+            .range([0, width])
+            .domain(data.map((d) => { 
+                return d['Subcategory'] }))
+            .padding(0.2);
         
         
         
@@ -126,13 +163,13 @@ class BarGraph extends Component {
             .domain([0, yMax])
             .range([height, 0]);
         
-        svg
+        /*svg
             .append('g')
             .attr('transform', `translate(${margin.left}, 0)`)
             .attr('class', 'y-axis')
             .call(
                 d3.axisLeft(yScale)
-            );
+            ); */
 
         const tooltip = d3.select('#bar-viz')
             .append('div')
@@ -142,29 +179,63 @@ class BarGraph extends Component {
         
         // Bar code
         
-        svg
+        /*svg
             .selectAll('bar')
             .data(data)
             .enter()
             .append('rect')
-                .attr('transform', `translate(${margin.left}, 0)`)
+                .attr('transform', `translate(${margin.left}, ${margin.top})`)
+                .attr('x', (d) => { return xScale(d['Subcategory']); })
+                .attr('width', xScale.bandwidth())
+                .attr('fill', (d) => { 
+                    return colorScale(d['Profit Percentage']); })
+                .attr('height', (d) => { return height - yScale(0); })
+                .attr('y', (d) => { return yScale(0); }) */
+        
+        var bar = svg
+            .selectAll('rect')
+            .data(data)
+        
+        bar
+            .enter()
+            .append('rect')
+                .attr('transform', `translate(${margin.left}, ${margin.top})`)
                 .attr('x', (d) => { return xScale(d['Subcategory']); })
                 .attr('width', xScale.bandwidth())
                 .attr('fill', (d) => { 
                     return colorScale(d['Profit Percentage']); })
                 .attr('height', (d) => { return height - yScale(0); })
                 .attr('y', (d) => { return yScale(0); })
+            
         
         // Animation
         svg
             .selectAll('rect')
             .transition()
             .duration(1000)
-            .attr('y', (d) => { return yScale(d['Sales Percentage']); })
+            .attr('y', (d) => { 
+                console.log("woop 1", d['Subcategory'], d['Sales Percentage'], yScale(d['Sales Percentage']));
+                return yScale(d['Sales Percentage']); })
             .attr('height', (d) => { return height - yScale(d['Sales Percentage']); })
             .attr('fill', (d) => { return colorScale(d['Profit Percentage']); })
         
+
+
+        svg.transition().select('.x-axis')
+            .duration(1000)
+            .call(
+                d3.axisBottom(xScale)
+            )
+            .selectAll('text')
+                .attr('transform', 'translate(-10, 10)rotate(-45)')
+                .attr("fill", "#ffffff")
+                .style('text-anchor', 'end');
         
+        svg.transition().select('.y-axis')
+            .duration(1000)
+            .call(
+                d3.axisLeft(yScale)
+            )
         
         
         // Tooltip
@@ -178,7 +249,7 @@ class BarGraph extends Component {
             .on('mousemove', (event, d) => {
                 tooltip
                     .style('left', event.pageX - 75 + 'px')
-                    .style('top', event.pageY - 100 + 'px')
+                    .style('top', event.pageY - 85 + 'px')
                     .html(`<h1>${d['Subcategory']}</h1><p>Sales Percentage: ${d['Sales Percentage'].toFixed(1)}</p><p>Profit Percentage: ${d['Profit Percentage'].toFixed(1)}</p>`);
                     //.style('display', 'inline-block')
             })
@@ -188,12 +259,14 @@ class BarGraph extends Component {
                     .style('opacity', 0);
             })
         
-        /*svg.selectAll('div').exit().remove(); */
-        svg.selectAll('rect').data(data).exit().remove();
-        svg.selectAll('.bar-tooltip').data(data).exit().remove();
 
-        var yAxis = 
-        svg.selectAll('g.y-axis').call()
+        bar
+            .exit()
+            .remove()
+        //svg.selectAll('div').exit().remove(); 
+        //svg.selectAll('rect').data(data).exit().remove();
+        //svg.selectAll('.bar-tooltip').data(data).exit().remove();
+
         
     }
 

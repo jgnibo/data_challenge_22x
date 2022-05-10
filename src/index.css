@@ -20,6 +20,7 @@
     font-family: alliance-eb;
     color: white;
     text-align: center;
+    letter-spacing: 0.03em;
 }
 
 body {
@@ -28,6 +29,14 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-family: alliance;
+}
+
+.MuiRadio-root {
+    color: white !important;
+}
+
+.MuiTypography-root {
+    font-family: alliance !important;
 }
 
 .viz-module {
@@ -40,6 +49,7 @@ body {
 .module-header {
     color: #ffffff;
     font-family: alliance-eb;
+    letter-spacing: 0.03em;
 }
 
 code {

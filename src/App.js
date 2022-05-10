@@ -16,7 +16,7 @@ class App extends Component {
             <div>
                 <h1 id="title">Superstore Dataset</h1>
                 
-                <BarGraph height={600} width={1000} />
+                <BarGraph height={800} width={1000} />
             </div>
             
         );
