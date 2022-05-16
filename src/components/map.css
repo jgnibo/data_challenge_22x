@@ -1,0 +1,22 @@
+.map-tooltip {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    border-radius: 5px;
+    padding: 5px;
+    background: rgba(0, 0, 0, 0.5);
+    width: 150px;
+    height: 75px;
+    position: absolute;
+    pointer-events: none;
+    box-sizing: border-box;
+}
+
+.tooltip-title {
+    font-weight: 500px;
+    color: orange;
+}
+
+.tooltip-desc {
+    color: white;
+}

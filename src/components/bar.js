@@ -1,6 +1,4 @@
 import React, { Component, useCallback } from 'react';
-import Checkbox from '@mui/material/Checkbox';
-import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { enableAllPlugins, produce } from 'immer';
 import * as d3 from 'd3';
@@ -56,13 +54,14 @@ class BarGraph extends Component {
                 }),
             );
         }).catch((err) => {
-            console.log("error", err);
+            console.log('error', err);
         });
     }
 
     createChart = () => {
         const margin = { top: 50, right: 30, bottom: 150, left: 75 };
 
+        // Initialize the graph
         const svg = d3
             .select('#bar-viz')
             .append('svg')
@@ -97,7 +96,6 @@ class BarGraph extends Component {
             .attr('class', 'y-axis')
             .attr('transform', `translate(0,0)`)
             .call(yAxis);
-            
     }
 
     updateChart(data) {
@@ -108,8 +106,6 @@ class BarGraph extends Component {
         const yMin = d3.min(data, (d) => d['Sales Percentage']);
         const yMax = d3.max(data, (d) => d['Sales Percentage']);
 
-        const xMin = d3.min(data, (d) => d['Subcategory']);
-        const xMax = d3.max(data, (d) => d['Subcategory']);
 
         const colorMin = d3.min(data, (d) => d['Profit Percentage']);
         const colorMax = d3.max(data, (d) => d['Profit Percentage']);
@@ -120,32 +116,7 @@ class BarGraph extends Component {
         const colorScale = d3
             .scaleLinear()
             .domain([colorMin, colorMax])
-            //.range(['#BA1D53', '#FF0540'])
             .range(['#BA1D53', '#FFFFFF'])
-            
-        // X axis code
-        /*var xScale = d3
-            .scaleBand()
-            .range([0, width])
-            .domain(data.map((d) => { 
-                return d['Subcategory'] }))
-            .padding(0.2);
-        svg
-            .append('g')
-            .attr('class', 'x-axis')
-            .attr('transform', `translate(${margin.left}, ${height})`)
-            .call(
-                d3.axisBottom(xScale)
-            )
-            .selectAll('text')
-                .attr('transform', 'translate(-10, 10)rotate(-45)')
-                .attr("fill", "#ffffff")
-                .style('text-anchor', 'end'); */
-        
-        /*xScale
-            .domain(data.map((d) => { 
-                return d['Subcategory'] }))
-            .padding(0.2); */
         
         const xScale = d3
             .scaleBand()
@@ -162,35 +133,11 @@ class BarGraph extends Component {
             .scaleLinear()
             .domain([0, yMax])
             .range([height, 0]);
-        
-        /*svg
-            .append('g')
-            .attr('transform', `translate(${margin.left}, 0)`)
-            .attr('class', 'y-axis')
-            .call(
-                d3.axisLeft(yScale)
-            ); */
 
         const tooltip = d3.select('#bar-viz')
             .append('div')
             .attr('class', 'bar-tooltip')
             .style('opacity', 0)
-
-        
-        // Bar code
-        
-        /*svg
-            .selectAll('bar')
-            .data(data)
-            .enter()
-            .append('rect')
-                .attr('transform', `translate(${margin.left}, ${margin.top})`)
-                .attr('x', (d) => { return xScale(d['Subcategory']); })
-                .attr('width', xScale.bandwidth())
-                .attr('fill', (d) => { 
-                    return colorScale(d['Profit Percentage']); })
-                .attr('height', (d) => { return height - yScale(0); })
-                .attr('y', (d) => { return yScale(0); }) */
         
         var bar = svg
             .selectAll('rect')
@@ -213,9 +160,7 @@ class BarGraph extends Component {
             .selectAll('rect')
             .transition()
             .duration(1000)
-            .attr('y', (d) => { 
-                console.log("woop 1", d['Subcategory'], d['Sales Percentage'], yScale(d['Sales Percentage']));
-                return yScale(d['Sales Percentage']); })
+            .attr('y', (d) => { return yScale(d['Sales Percentage']); })
             .attr('height', (d) => { return height - yScale(d['Sales Percentage']); })
             .attr('fill', (d) => { return colorScale(d['Profit Percentage']); })
         
@@ -250,8 +195,7 @@ class BarGraph extends Component {
                 tooltip
                     .style('left', event.pageX - 75 + 'px')
                     .style('top', event.pageY - 85 + 'px')
-                    .html(`<h1>${d['Subcategory']}</h1><p>Sales Percentage: ${d['Sales Percentage'].toFixed(1)}</p><p>Profit Percentage: ${d['Profit Percentage'].toFixed(1)}</p>`);
-                    //.style('display', 'inline-block')
+                    .html(`<h1>${d['Subcategory']}</h1><p>Sales Percentage: ${d['Sales Percentage'].toFixed(1)}%</p><p>Profit Percentage: ${d['Profit Percentage'].toFixed(1)}%</p>`);
             })
             .on('mouseout', (d) => {
                 tooltip.transition()
@@ -263,9 +207,6 @@ class BarGraph extends Component {
         bar
             .exit()
             .remove()
-        //svg.selectAll('div').exit().remove(); 
-        //svg.selectAll('rect').data(data).exit().remove();
-        //svg.selectAll('.bar-tooltip').data(data).exit().remove();
 
         
     }
@@ -305,17 +246,18 @@ class BarGraph extends Component {
     render() {
         return (
             <div id="bar-viz-wrapper" className="viz-module">
-                <h2 className="module-header">Segmented Profit by Subcategory</h2>
+                <h2 className="module-header">Segmented Sales and Profit by Subcategory</h2>
                 <div className="selectors">
-                    <RadioGroup onChange={this.optionClicked} row aria-labelledby="demo-radio-buttons-group-label" defaultValue="consumer" name="radio-buttons-group">
+                    <RadioGroup onChange={this.optionClicked} row aria-labelledby="demo-radio-buttons-group-label" defaultValue="consumer" name="bar-radios">
                         <FormControlLabel value="consumer" control={<Radio />} label="Consumer" />
                         <FormControlLabel value="corporate" control={<Radio />} label="Corporate" />
                         <FormControlLabel value="home" control={<Radio />} label="Home Office" />
                     </RadioGroup>
                 </div>
                 {this.renderGraph()}
-                <div id="bar-viz">
-
+                <div id="bar-viz"></div>
+                <div className="viz-description">
+                    <p>This bar graph shows sales and profit as a percentage of total sales and profit (respectively) by subcategory. The height of each bar represents that subcategory's percentage of total sales, while the color indicates the percentage of total profit. The whiter the color, the more profitable (with respect to total profit) a subcategory is. The redder the color, the less profitable that subcategory is. This graph points out some interesting characteristics of certain subcategories, particularly tables. Pay attention to the y-axis scaling when you change segments, and also hover over a bar to bring up a tooltip with exact sales and profit percentages. </p>
                 </div>
             </div>
         );

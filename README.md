@@ -1,6 +1,40 @@
-# Getting Started with Create React App
+# Data Challenge 22X
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This repo contains my submission for the DALI data challenge 22X! I put a lot more effort in compared to last time, particularly in attempting to code my visualizations from scratch using D3. Hope you enjoy!
+
+<br />
+
+## Part 1: Visualizations
+
+Please view the visualizations deployed here.
+
+### Part 1 Additional Notes
+
+The visualizations are broken down into individual components:
+- [bar.js](./src/components/map.js)
+- [line_graph.js](./src/components/map.js)
+- [map.js](./src/components/map.js)
+
+Data is held in each component's state and is imported via CSV. These CSVs were built with the help of [this notebook](./src/notebooks/superstore_functions.ipynb) (`src/notebooks/superstore_functions.ipynb`), and each CSV was downloaded to the `src/notebooks` folder. Data cleaning and analysis for the visualizations were also done in the `superstore_functions` notebook.
+
+A couple things I didn't get around to but want to add when I have some more time:
+- Axis labels
+- Tooltip for the line graph
+- Transition for the line graph
+
+I spent a lot of time working with D3 to complete these visualizations, and feel very confident in my ability to add these features. Just ran out of time.
+
+<br />
+
+## Part 2: Sales Prediction Model
+
+Please view the machine learning jupyter notebook [here](./src/notebooks/superstore_ml.ipynb) (`src/notebooks/superstore_ml.ipynb`)
+
+I first performed some EDA using basic pandas functions. I wanted to separate the data from individual identities, so I dropped identity-linked columns (such as name) amongst others. After I completed the EDA, I used sklearn to implement several different regression models in an effort to predict sales based on a variety of features. The most successful model was ...
+
+
+
+<br />
 
 ## Available Scripts
 
@@ -14,66 +48,5 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
 
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
 
 
-
-
-all of these have options for selectors
-
-first viz is profit/sales over time
-second is map of profit/sales
-third is profit by category

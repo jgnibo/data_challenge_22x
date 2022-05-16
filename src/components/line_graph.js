@@ -125,19 +125,6 @@ class LineGraph extends Component {
             .scaleLinear()
             .domain([0, yMax])
             .range([height, 0])
-        
-        /*const valueLine = d3
-            .line()
-            .x((d) => { return xScale(d['Order Date']); })
-            .y((d) => { return yScale(d['Sales']); })
-
-        svg.append('path')
-            .data(data)
-            .attr('class', 'line')
-            .attr("fill", "none")
-            .attr("stroke", "steelblue")
-            .attr("stroke-width", 1.5)
-            .attr('d', valueLine) */
 
         var salesLine = svg
             .selectAll('path')
@@ -165,102 +152,11 @@ class LineGraph extends Component {
             .selectAll('path')
             .transition()
             .duration(1000)
-    
-
-
-
-            
         
         salesLine
             .exit()
             .remove();
 
-        /* const svg = d3
-            .select('#line-viz')
-            .append('svg')
-            .attr('width', this.props.width + margin.left + margin.right)
-            .attr('height', this.props.height + margin.top + margin.bottom)
-            .append('g')
-            .attr('transform', `translate(${margin.left}, ${margin.top})`);
-        
-
-        // X axis code
-        const xScale = d3
-            .scaleLinear()
-            .domain([xMinValue, xMaxValue])
-            .range([0, this.props.width]);
-
-        svg
-            .append('g')
-            .attr('class', 'axis')
-            .attr('transform', `translate(0, ${this.props.height})`)
-            .call(
-                d3.axisBottom(xScale)
-                    .tickSize(-this.props.height)
-                    .tickFormat(''),
-            );
-        
-        svg
-            .append('g')
-            .attr('class', 'line-text')
-            .attr('transform', `translate(0, ${this.props.height})`)
-            .call(
-                d3.axisBottom(xScale).tickFormat((d) => {
-                    const date = new Date(d);
-                    const month = date.getMonth();
-                    const year = date.getFullYear();
-                    if (month <= 2) {
-                        return "Q1 " + year;
-                    } else if (month <= 5) {
-                        return "Q2 " + year;
-                    } else if (month <= 8) {
-                        return "Q3 " + year;
-                    } else {
-                        return "Q4 " + year;
-                    }
-                })
-                    //d3.timeFormat('%B %Y'))
-            );
-
-
-        
-
-        // Y axis code
-        const yScale = d3
-            .scaleLinear()
-            .domain([0, yMaxValue])
-            .range([this.props.height, 0]);
-        
-        svg
-            .append('g')
-            .attr('class', 'axis')
-            .call(
-                d3.axisLeft(yScale)
-                    .tickSize(-this.props.width)
-                    .tickFormat(''),
-            );
-        
-        svg
-            .append('g')
-            .attr('class', 'line-text')
-            .call(
-                d3.axisLeft(yScale)
-            );
-        
-        const line = d3
-            .line()
-            .x(d => xScale(d['Order Date']))
-            .y(d => yScale(d['Sales']))
-        
-        svg
-            .append('path')
-            .datum(data)
-            .attr('fill', 'none')
-            .attr('stroke', '#ffffff')
-            .attr('stroke-width', 2)
-            .attr('class', 'line')
-            .attr('d', line); */
-        
         svg.transition().select('.x-axis-line')
             .duration(1000)
             .call(
@@ -325,7 +221,7 @@ class LineGraph extends Component {
     render() {
         return (
             <div id="line-viz-wrapper" className="viz-module">
-                <h2 className="module-header">Segmented Quarterly Profit</h2>
+                <h2 className="module-header">Segmented Quarterly Mean Sales</h2>
                 <div className="selectors">
                     <RadioGroup onChange={this.optionClicked} row aria-labelledby="demo-radio-buttons-group-label" defaultValue="consumer" name="line-radios">
                         <FormControlLabel value="consumer" control={<Radio />} label="Consumer" />
@@ -335,8 +231,9 @@ class LineGraph extends Component {
 
                 </div>
                 {this.renderGraph()}
-                <div id="line-viz">
-
+                <div id="line-viz"></div>
+                <div className="viz-description">
+                    <p>This line graph shows quarterly mean sales by segment. Play with the selectors to see how each segment performed sales-wise, using the provided data grouped into quarters. Pay attention to the y-axis, as the range and scale changes when segments change.</p>
                 </div>
             </div>
             
