@@ -21,6 +21,7 @@ A couple things I didn't get around to but want to add when I have some more tim
 - Axis labels
 - Tooltip for the line graph
 - Transition for the line graph
+- Legends for color scales
 
 I spent a lot of time working with D3 to complete these visualizations, and feel very confident in my ability to add these features. Just ran out of time.
 
