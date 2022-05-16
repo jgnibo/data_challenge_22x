@@ -31,7 +31,7 @@ I spent a lot of time working with D3 to complete these visualizations, and feel
 
 Please view the machine learning jupyter notebook [here](./src/notebooks/superstore_ml.ipynb) (`src/notebooks/superstore_ml.ipynb`)
 
-I first performed some EDA using basic pandas functions. I wanted to separate the data from individual identities, so I dropped identity-linked columns (such as name) amongst others. After I completed the EDA, I used sklearn to implement several different regression models in an effort to predict sales based on a variety of features. The most successful model was a random forest regressor with a MAD of 81.6.
+I first performed some EDA using basic pandas functions. I wanted to separate the data from individual identities, so I dropped identity-linked columns (such as name) amongst others. After I completed the EDA, I used sklearn to implement several different regression models in an effort to predict sales based on a variety of features. The most successful model was a random forest regressor with a MAD of 53.78 and a cross val score of 72.6%.
 
 
 
