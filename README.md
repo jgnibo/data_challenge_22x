@@ -6,7 +6,7 @@ This repo contains my submission for the DALI data challenge 22X! I put a lot mo
 
 ## Part 1: Visualizations
 
-Please view the visualizations deployed here.
+Please view the visualizations deployed [here](!https://genuine-flan-85a02b.netlify.app/).
 
 ### Part 1 Additional Notes
 
