@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import Checkbox from '@mui/material/Checkbox';
-
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { enableAllPlugins, produce } from 'immer';
 import * as d3 from 'd3';
@@ -111,10 +109,10 @@ class LineGraph extends Component {
         const svg = d3
             .select('#line-viz').select('svg')
         
-        const colorScale = d3
+        /*const colorScale = d3
             .scaleLinear()
             .domain(['consumer', 'corporate', 'producer'])
-            .range(['#E17768', '#FFB35E', '#F9F871'])
+            .range(['#E17768', '#FFB35E', '#F9F871']) */
         
         const xScale = d3
             .scaleLinear()

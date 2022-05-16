@@ -1,4 +1,4 @@
-import React, { Component, useCallback } from 'react';
+import React, { Component } from 'react';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { enableAllPlugins, produce } from 'immer';
 import * as d3 from 'd3';
@@ -102,8 +102,7 @@ class BarGraph extends Component {
         const margin = { top: 50, right: 50, bottom: 150, left: 75 };
         const width = this.props.width - margin.left - margin.right;
         const height = this.props.height - margin.top - margin.bottom;
-
-        const yMin = d3.min(data, (d) => d['Sales Percentage']);
+        
         const yMax = d3.max(data, (d) => d['Sales Percentage']);
 
 

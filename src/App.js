@@ -7,9 +7,6 @@ import Map from './components/map'
 
 
 class App extends Component {
-    constructor(props) {
-        super(props);
-    }
 
     render() {
         return (

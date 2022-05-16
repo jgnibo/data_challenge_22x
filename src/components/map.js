@@ -1,4 +1,4 @@
-import React, { Component, useCallback } from 'react';
+import React, { Component } from 'react';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { enableAllPlugins, produce } from 'immer';
 import * as d3 from 'd3';
@@ -87,15 +87,14 @@ class Map extends Component {
             .append('div')
             .attr('class', 'map-tooltip')
             .style('opacity', 0)
+        
+        console.log(svg, tooltip);
 
     }
 
     updateChart(data) {
-        console.log("data", data);
         const colorMin = d3.min(data.features, (d) => d.properties['Sales']);
         const colorMax = d3.max(data.features, (d) => d.properties['Sales']);
-
-        console.log(colorMin, colorMax);
 
         const colorScale = d3
             .scaleSqrt()
@@ -152,8 +151,6 @@ class Map extends Component {
                     .style('opacity', 1)
             })
             .on('mousemove', (event, d) => {
-                console.log('D HERE', d);
-                console.log(event.pageX, event.pageY);
                 tooltip
                     .style('left', event.pageX - 75 + 'px')
                     .style('top', event.pageY - 85 + 'px')

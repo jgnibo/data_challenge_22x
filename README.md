@@ -11,8 +11,8 @@ Please view the visualizations deployed here.
 ### Part 1 Additional Notes
 
 The visualizations are broken down into individual components:
-- [bar.js](./src/components/map.js)
-- [line_graph.js](./src/components/map.js)
+- [bar.js](./src/components/bar.js)
+- [line_graph.js](./src/components/line_graph.js)
 - [map.js](./src/components/map.js)
 
 Data is held in each component's state and is imported via CSV. These CSVs were built with the help of [this notebook](./src/notebooks/superstore_functions.ipynb) (`src/notebooks/superstore_functions.ipynb`), and each CSV was downloaded to the `src/notebooks` folder. Data cleaning and analysis for the visualizations were also done in the `superstore_functions` notebook.
