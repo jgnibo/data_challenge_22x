@@ -1,12 +1,15 @@
 import React, { Component } from 'react';
 import Checkbox from '@mui/material/Checkbox';
-import FormGroup from '@mui/material/FormGroup';
+
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { enableAllPlugins, produce } from 'immer';
 import * as d3 from 'd3';
 import consumerData from './../notebooks/consumer_q_sales.csv'
 import corporateData from './../notebooks/corporate_q_sales.csv'
 import homeData from './../notebooks/home_q_sales.csv'
+
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
 
 
 enableAllPlugins();
@@ -16,15 +19,12 @@ class LineGraph extends Component {
         super(props);
 
         this.state = {
-            consumerSelected: true,
-            corporateSelected: false,
-            homeSelected: false,
-            allSelected: false,
             data: {
                 consumerData: {},
                 corporateData: {},
                 homeData: {}
-            }
+            },
+            workingData: null
         }
     }
 
@@ -32,6 +32,7 @@ class LineGraph extends Component {
         this.parseData(consumerData, 'consumerData');
         this.parseData(corporateData, 'corporateData');
         this.parseData(homeData, 'homeData');
+        this.createChart();
     }
 
     parseData(data, segment) {
@@ -47,6 +48,9 @@ class LineGraph extends Component {
             this.setState(
                 produce((draft) => {
                     draft.data[segment] = newData;
+                    if(segment === 'consumerData') {
+                        draft.workingData = newData;
+                    }
                 }),
             );
         }).catch((err) => {
@@ -54,59 +58,124 @@ class LineGraph extends Component {
         });
     }
 
-    toggleConsumer = () =>  {
-        this.setState(
-            produce((draft) => {
-                draft.consumerSelected = !draft.consumerSelected;
-            }),
-        );
-        console.log(this.state.data);
-    }
-
-    toggleCorporate = () => {
-        this.setState(
-            produce((draft) => {
-                draft.corporateSelected = !draft.corporateSelected;
-            }),
-        );
-        this.drawChart(this.state.data.consumerData);
-    }
-
-    toggleHome = () =>  {
-        this.setState(
-            produce((draft) => {
-                draft.homeSelected = !draft.homeSelected;
-            }),
-        );
-        console.log(this.state.data);
-    }
-
-    toggleAll = () =>  {
-        this.setState(
-            produce((draft) => {
-                draft.allSelected = !draft.allSelected;
-                if (draft.allSelected) {
-                    draft.consumerSelected = false;
-                    draft.corporateSelected = false;
-                    draft.homeSelected = false;
-                }  else {
-                    draft.consumerSelected = true;
-                }
-            }),
-        );
-    }
-
-    drawChart(data) {
-        const margin = { top: 10, right: 50, bottom: 50, left: 50 }
-
-        const yMinValue = d3.min(data, (d) => d['Sales']);
-        const yMaxValue = d3.max(data, (d) => d['Sales']);
-        const xMinValue = d3.min(data, d => d['Order Date']);
-        const xMaxValue = d3.max(data, d => d['Order Date']);
-
-        console.log(yMinValue, yMaxValue, xMinValue, xMaxValue);
+    createChart = () => {
+        const margin = { top: 50, right: 30, bottom: 150, left: 75 };
 
         const svg = d3
+            .select('#line-viz')
+            .append('svg')
+            .attr('width', this.props.width)
+            .attr('height', this.props.height)
+            .append('g')
+            .attr('transform', `translate(${margin.left},${margin.top})`)
+
+        const xScale = d3
+            .scaleLinear()
+            .range([0, this.props.width - margin.left - margin.right])
+        
+        const yScale = d3
+            .scaleLinear()
+            .range([this.props.height-margin.top-margin.bottom])
+
+        const xAxis = d3
+            .axisBottom(xScale)
+
+        const yAxis = d3
+            .axisLeft(yScale)
+    
+        
+        svg
+            .append('g')
+            .attr('class', 'x-axis-line')
+            .attr('transform', `translate(0, ${this.props.height-margin.top-margin.bottom})`)
+            .call(xAxis);
+        
+        svg
+            .append('g')
+            .attr('class', 'y-axis-line')
+            .call(yAxis);
+    }
+
+    updateChart(data) {
+        const margin = { top: 50, right: 50, bottom: 150, left: 75 };
+        const width = this.props.width - margin.left - margin.right;
+        const height = this.props.height - margin.top - margin.bottom;
+
+        const yMin = d3.min(data, (d) => d['Sales']);
+        const yMax = d3.max(data, (d) => d['Sales']);
+        const xMin = d3.min(data, (d) => d['Order Date']);
+        const xMax = d3.max(data, (d) => d['Order Date']);
+
+        console.log(yMin, yMax, xMin, xMax);
+
+        const svg = d3
+            .select('#line-viz').select('svg')
+        
+        const colorScale = d3
+            .scaleLinear()
+            .domain(['consumer', 'corporate', 'producer'])
+            .range(['#E17768', '#FFB35E', '#F9F871'])
+        
+        const xScale = d3
+            .scaleLinear()
+            .range([0, width])
+            .domain([xMin, xMax])
+        
+        const yScale = d3
+            .scaleLinear()
+            .domain([0, yMax])
+            .range([height, 0])
+        
+        /*const valueLine = d3
+            .line()
+            .x((d) => { return xScale(d['Order Date']); })
+            .y((d) => { return yScale(d['Sales']); })
+
+        svg.append('path')
+            .data(data)
+            .attr('class', 'line')
+            .attr("fill", "none")
+            .attr("stroke", "steelblue")
+            .attr("stroke-width", 1.5)
+            .attr('d', valueLine) */
+
+        var salesLine = svg
+            .selectAll('path')
+            .data([data])
+
+        salesLine
+            .enter()
+                
+        var line = d3
+            .line()
+            .x(d => xScale(d['Order Date']))
+            .y(d => yScale(d['Sales']))
+                
+        svg
+            .append('path')
+            .attr('transform', `translate(${margin.left},${margin.top})`)
+            .datum(data)
+            .attr('fill', 'none')
+            .attr('stroke', '#ffffff')
+            .attr('stroke-width', 2)
+            .attr('class', 'line')
+            .attr('d', line); 
+        
+        svg
+            .selectAll('path')
+            .transition()
+            .duration(1000)
+    
+
+
+
+            
+        
+        salesLine
+            .exit()
+            .remove();
+
+        /* const svg = d3
             .select('#line-viz')
             .append('svg')
             .attr('width', this.props.width + margin.left + margin.right)
@@ -190,18 +259,82 @@ class LineGraph extends Component {
             .attr('stroke', '#ffffff')
             .attr('stroke-width', 2)
             .attr('class', 'line')
-            .attr('d', line);
+            .attr('d', line); */
+        
+        svg.transition().select('.x-axis-line')
+            .duration(1000)
+            .call(
+                d3.axisBottom(xScale).tickFormat((d) => {
+                    const date = new Date(d);
+                    const month = date.getMonth();
+                    const year = date.getFullYear();
+                    if (month <= 2) {
+                        return "Q1 " + year;
+                    } else if (month <= 5) {
+                        return "Q2 " + year;
+                    } else if (month <= 8) {
+                        return "Q3 " + year;
+                    } else {
+                        return "Q4 " + year;
+                    }
+                })
+            )
+            .selectAll('text')
+                .attr('transform', 'translate(-10, 10)rotate(-45)')
+                .style('text-anchor', 'end');
+        
+        svg.transition().select('.y-axis-line')
+            .duration(1000)
+            .call(
+                d3.axisLeft(yScale)
+            )
+    } 
+
+    optionClicked = (event) => {
+        if (event.target.value === 'consumer') {
+            this.setState(
+                produce((draft) => {
+                    draft.workingData = draft.data.consumerData;
+                }),
+            );
+        } else if (event.target.value === "corporate") {
+            this.setState(
+                produce((draft) => {
+                    draft.workingData = draft.data.corporateData;
+                }),
+            );
+        } else if (event.target.value === 'home') {
+            this.setState(
+                produce((draft) => {
+                    draft.workingData = draft.data.homeData;
+                }),
+            );
+        }
+    }
+
+    renderGraph() {
+        if(this.state.workingData) {
+            this.updateChart(this.state.workingData);
+        } else {
+            return (
+                <div>Loading...</div>
+            );
+        }
     }
 
     render() {
         return (
             <div id="line-viz-wrapper" className="viz-module">
+                <h2 className="module-header">Segmented Quarterly Profit</h2>
                 <div className="selectors">
-                    <FormControlLabel control={<Checkbox defaultChecked onChange={this.toggleConsumer} checked={this.state.consumerSelected} disabled={this.state.allSelected} />} label="Consumer" />
-                    <FormControlLabel control={<Checkbox onChange={this.toggleCorporate} checked={this.state.corporateSelected} disabled={this.state.allSelected} />} label="Corporate" />
-                    <FormControlLabel control={<Checkbox onChange={this.toggleHome} checked={this.state.homeSelected} disabled={this.state.allSelected} />} label="Home Office" />
-                    <FormControlLabel control={<Checkbox onChange={this.toggleAll} checked={this.state.allSelected}/>} label="All" />
+                    <RadioGroup onChange={this.optionClicked} row aria-labelledby="demo-radio-buttons-group-label" defaultValue="consumer" name="line-radios">
+                        <FormControlLabel value="consumer" control={<Radio />} label="Consumer" />
+                        <FormControlLabel value="corporate" control={<Radio />} label="Corporate" />
+                        <FormControlLabel value="home" control={<Radio />} label="Home Office" />
+                    </RadioGroup>
+
                 </div>
+                {this.renderGraph()}
                 <div id="line-viz">
 
                 </div>
